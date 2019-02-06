@@ -2,15 +2,15 @@
 GNU parallel enables us to run as many jobs in parallel instead of sequentially thus saving lots of time. Unlike creating a queue for exectution of processes in a sequential run, GNU parallel tends to maximally parallize the execution over available processors in an embarassingly parallel fashion.
 
 For example, a parallel command to change formats of all files with csv extension to .txt using gnu-parallel is presented. 
-
+      module load image-magick-7.0.5-9-gcc-4.8.5-python2-xzyy5cz
       $find . -name "*csv" | parallel -I% --max-args 1 convert % %.txt
 
 Here the command finds all the files with .csv extension first and parallely converts them to txt format .
 
 Similarly, parallel can also used to compressed as many files and decompress them.
 
-     $parallel gzip ::: *.jpg
-     $parallel gunzip ::: *.jpg
+     $parallel gzip ::: *.txt
+     $parallel gunzip ::: *.gz
   
 Tha above two commands can be used to zip and unzip image files with .jpg exptesion over given path. 
 
@@ -22,7 +22,7 @@ Tha above two commands can be used to zip and unzip image files with .jpg exptes
 
 GNU Parallel takes many different arguments, but here we will use only two, --arg-file and {}. --arg-file precedes an input file name, “msizes”, and {} is replaced with each line of the input file. A different copy of Matlab is run simultaneously, with each line of the input file replacing {} in each copy. This is Matlab in high-throughput mode (on a single node). Here is the new “parallel matlab” command:
 
-	parallel --arg-file msizes ‘matlab –nojvm –nodisplay –r “msize={};program” >/dev/null’ 
+	parallel --arg-file msizes ‘matlab –nojvm –nodisplay –r “msize={};program”' >/dev/null 
 
 Single quotes are required around the Matlab portion of the parallel Matlab command. The actual Matlab code is enclosed in double quotes. The contents of the input file, msizes, is:
 
@@ -54,7 +54,7 @@ So far, the command has run Matlab in high-throughput mode on only a single node
 
 The parent process id is now prepended to the file name. This is helpful because there will now be multiple output files, and they must all have unique names. The command to run Matlab is now:
 		
-	parallel -j0 --arg-file msizes 'matlab nojvm -nodisplay -r "msize={};pid=$PPID;program"' >/dev/null
+	parallel -j0 --arg-file msizes 'matlab -nojvm -nodisplay -r "msize={};pid=$PPID;program"' >/dev/null
 
 The $PPID (parent process id#) is input to program.m as the pid variable. The -j0 flag ensures that as many cores as possible on the node are used. Running this command (just as an example, without the PBS batch file) would produce output files: 
 	 
@@ -132,7 +132,7 @@ The usage of gnu-parallel for python tasks is similar to that of matlab. Followi
 	module load anaconda
 
 	# activate python environment
-	source activate numpy_py3
+	source activate numpy_py3   #you need to have numpy_py3 environment with numpy installed. Refer to Anaconda quickbytes. 
 
 	# change to directory PBS script was submitted. 
 	cd $PBS_O_WORKDIR
@@ -140,7 +140,7 @@ The usage of gnu-parallel for python tasks is similar to that of matlab. Followi
 	# set jobs per node, which is core per node for galles
 	JOBSPERNODE=8
 
-	/usr/bin/time -o time.log parallel --joblog logfile --wd $PBS_O_WORKDIR/out -j $JOBSPERNODE --sshloginfile $PBS_NODEFILE --env PATH -a mat_in python matrix_inv.py
+	/usr/bin/time -o time.log parallel --joblog logfile --wd $PBS_O_WORKDIR -j $JOBSPERNODE --sshloginfile $PBS_NODEFILE --env PATH -a mat_in python matrix_inv.py
 
 ### code for matrix_inv.py file
 	# Import Libraries
