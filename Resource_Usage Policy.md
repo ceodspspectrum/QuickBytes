@@ -17,7 +17,7 @@ Node Access Policy |	Single Job/Node ie (Multiple users can’t share resources 
 
 Parameters |	Soft Limit  |	Hardlimit
 --- | --- | ---
-Number of Processes |	160 |	200
+Number of Processes |	160 |	400
 Number of Nodes	|20 | 25
 Processes per Node |	8  | 8
 
